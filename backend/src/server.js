@@ -166,7 +166,7 @@ app.post('/api/admin/logout', (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
 });
 
-app.use(express.static(path.join(ROOT, 'frontend')));
+app.use(express.static(ROOT));
 app.use('/admin', express.static(path.join(ROOT, 'admin')));
 
 const PORT = process.env.PORT || 3000;
