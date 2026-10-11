@@ -1,0 +1,22 @@
+{
+  "name": "abstractfluidart",
+  "version": "1.0.0",
+  "description": "Galería online de obra abstracta de Cristina Pacheco",
+  "type": "module",
+  "scripts": {
+    "start": "node backend/src/server.js",
+    "seed": "node backend/src/seed.js",
+    "init-db": "node backend/src/init-db.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
