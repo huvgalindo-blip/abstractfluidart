@@ -1,1 +1,113 @@
+/* ============================================================
+   AbstractFluidArt — Estilos base
+   Design tokens y reset.
+   Paleta inspirada en el dosier de Cristina:
+   papel algodón, tinta, tierras, agua y pigmento.
+   ============================================================ */
 
+/* --- Variables globales (design tokens) --- */
+:root {
+  /* Colores */
+  --color-bg: #faf7f2;         /* papel hueso, fondo general */
+  --color-ink: #1a1a1a;        /* tinta, texto principal */
+  --color-accent: #c2410c;     /* terracota, acento cálido */
+  --color-accent-2: #0e7490;   /* azul profundo */
+  --color-muted: #6b7280;      /* texto secundario */
+  --color-line: #e5e0d8;       /* líneas finas / bordes suaves */
+
+  /* Formas */
+  --radius: 12px;
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+  /* Tipografía */
+  --font-display: "Cormorant Garamond", Georgia, serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Ancho máximo del contenido */
+  --maxw: 1200px;
+}
+
+/* --- Reset sencillo --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- Tipografía base --- */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 0 0 0.5em;
+}
+
+h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); }
+h2 { font-size: clamp(1.6rem, 3vw, 2.4rem); }
+h3 { font-size: 1.25rem; }
+
+p {
+  margin: 0 0 1em;
+}
+
+/* --- Elementos comunes --- */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font: inherit;
+}
+
+/* --- Botones --- */
+.btn {
+  display: inline-block;
+  padding: 0.8rem 1.5rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.15s ease, background 0.2s, color 0.2s;
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+.btn--primary:hover {
+  transform: translateY(-2px);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--color-ink);
+  color: var(--color-ink);
+}
+
+.btn--ghost:hover {
+  background: var(--color-ink);
+  color: var(--color-bg);
+}
