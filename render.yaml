@@ -1,0 +1,31 @@
+# ============================================================
+# render.yaml — Configuración de despliegue en Render
+# Al hacer push a main, Render reconstruye y reinicia el servicio.
+# ============================================================
+
+services:
+  - type: web
+    name: abstractfluidart
+    runtime: node
+    plan: free
+    region: frankfurt          # el más cercano a España
+    branch: main
+    autoDeploy: true
+    buildCommand: npm install && npm run init-db && npm run seed
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: SESSION_SECRET
+        generateValue: true    # Render genera una aleatoria segura
+      - key: ADMIN_USER
+        value: admin
+      - key: ADMIN_PASS
+        sync: false            # lo pones tú en el panel de Render (para no dejarlo en el repo)
+      - key: BIZUM_PHONE
+        value: "+34627365261"
+      - key: SHIPPING_FREE_FROM_CENTS
+        value: "10000"
+      - key: SHIPPING_FLAT_CENTS
+        value: "690"
