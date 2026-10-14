@@ -66,6 +66,7 @@ app.get('/api/categories', (_req, res) => {
 });
 
 // Listado de obras (filtrable)
+// Si se pide ?featured=1 y no hay destacadas, devuelve las 6 últimas publicadas.
 app.get('/api/artworks', (req, res) => {
   const { featured, category, limit = 100 } = req.query;
   const where = ['is_published = 1'];
@@ -77,14 +78,28 @@ app.get('/api/artworks', (req, res) => {
     params.push(category);
   }
 
-  params.push(+limit);
   const sql = `SELECT a.*, c.slug AS category_slug, c.name AS category_name
                FROM artworks a
                LEFT JOIN categories c ON c.id = a.category_id
                WHERE ${where.join(' AND ')}
                ORDER BY a.sort_order, a.created_at DESC
                LIMIT ?`;
-  res.json(db.prepare(sql).all(...params));
+
+  let rows = db.prepare(sql).all(...params, +limit);
+
+  // Fallback: si pedían destacadas y no hay ninguna, mostramos las 6 últimas
+  if (featured && rows.length === 0) {
+    rows = db.prepare(`
+      SELECT a.*, c.slug AS category_slug, c.name AS category_name
+      FROM artworks a
+      LEFT JOIN categories c ON c.id = a.category_id
+      WHERE a.is_published = 1
+      ORDER BY a.created_at DESC
+      LIMIT 6
+    `).all();
+  }
+
+  res.json(rows);
 });
 
 // Detalle de una obra
@@ -260,7 +275,6 @@ app.post('/api/admin/artworks', requireAdmin, (req, res) => {
     }
   }
 
-  // El slug puede venir del cliente o generarse del título
   const slug = data.slug || slugify(data.title);
   const artist = db.prepare('SELECT id FROM artists LIMIT 1').get();
 
@@ -307,7 +321,6 @@ app.put('/api/admin/artworks/:id', requireAdmin, (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Obra no encontrada' });
 
   const data = { ...existing, ...req.body };
-  // Si cambia el título y no se ha forzado un slug, regenerar
   if (req.body.title && !req.body.slug) data.slug = slugify(req.body.title);
 
   try {
@@ -387,7 +400,6 @@ app.put('/api/admin/categories/:id', requireAdmin, (req, res) => {
 });
 
 app.delete('/api/admin/categories/:id', requireAdmin, (req, res) => {
-  // Pone a NULL la categoría de las obras afectadas
   db.prepare('UPDATE artworks SET category_id = NULL WHERE category_id = ?').run(req.params.id);
   db.prepare('DELETE FROM categories WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
