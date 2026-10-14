@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gracias — AbstractFluidArt</title>
+  <meta name="robots" content="noindex" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="container" style="padding: 3rem 1.25rem; max-width: 720px;">
+    <h1>¡Gracias por tu pedido!</h1>
+    <p>Hemos registrado tu pedido <strong id="ref">…</strong>.</p>
+
+    <!-- JS inyecta aquí las instrucciones de pago según el método elegido -->
+    <div id="payment-info"></div>
+
+    <a class="btn btn--ghost" href="/galeria.html" style="margin-top: 2rem;">
+      Seguir explorando
+    </a>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script type="module">
+    import { api } from '/js/api.js';
+    import { renderHeader, renderFooter } from '/js/layout.js';
+    renderHeader();
+    renderFooter();
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('order');
+    const method = params.get('method');
+
+    if (!id) {
+      document.querySelector('main').innerHTML =
+        '<h1>Pedido no encontrado</h1><p><a href="/galeria.html">Volver a la galería</a></p>';
+    } else {
+      try {
+        const o = await api.getOrder(id);
+        document.getElementById('ref').textContent = o.reference;
+
+        if (method === 'bizum' && o.status === 'pending') {
+          const info = await api.publicPayInfo();
+          document.getElementById('payment-info').innerHTML = `
+            <div class="pay-box">
+              <h2>Pago por Bizum</h2>
+              <p>Envía <strong>${(o.total_cents / 100).toFixed(2)} €</strong> al número:</p>
+              <p class="highlight">${info.bizum_phone}</p>
+              <p>Concepto: <code>${o.reference}</code></p>
+              <p style="font-size: 0.85rem; color: var(--color-muted);">
+                Recibirás confirmación por email en menos de 24 h.
+              </p>
+            </div>`;
+        } else if (method === 'paypal') {
+          document.getElementById('payment-info').innerHTML = `
+            <div class="pay-box">
+              <p>Si el pago se ha completado, recibirás confirmación por email en breve.</p>
+            </div>`;
+        }
+      } catch (err) {
+        console.error('Error cargando pedido:', err);
+      }
+    }
+  </script>
+</body>
+</html>
