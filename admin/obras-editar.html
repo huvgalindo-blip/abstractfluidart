@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editar obra · Admin · AbstractFluidArt</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    body { background: #f5f3ef; }
+    .admin-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .admin-side { background: #1a1a1a; color: #e5e0d8; padding: 2rem 1.2rem; }
+    .admin-side__brand { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #faf7f2; margin-bottom: 0.2rem; }
+    .admin-side__sub { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #c2410c; margin-bottom: 2rem; }
+    .admin-side__nav { display: grid; gap: 0.3rem; }
+    .admin-side__nav a { display: block; padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.9rem; color: #d4cec4; }
+    .admin-side__nav a:hover { background: #2a2a2a; color: #fff; }
+    .admin-side__nav a.active { background: #c2410c; color: #fff; font-weight: 600; }
+    .admin-side__logout { margin-top: 2rem; font-size: 0.85rem; color: #9b9489; cursor: pointer; background: none; border: none; padding: 0; }
+
+    .admin-main { padding: 2.5rem; max-width: 1200px; }
+    .breadcrumb { font-size: 0.85rem; color: var(--color-muted); margin-bottom: 0.5rem; }
+    .breadcrumb a { color: var(--color-accent); }
+    .admin-title { font-family: var(--font-display); font-size: 2rem; margin: 0 0 2rem; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .admin-shell { grid-template-columns: 1fr; }
+      .admin-side { padding: 1.2rem; }
+      .admin-main { padding: 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .form-card h2 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      margin: 0 0 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid #efece5;
+    }
+    .form-card + .form-card { margin-top: 1.5rem; }
+
+    .field { margin-bottom: 1.2rem; }
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--color-ink);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .field label .req { color: #c2410c; }
+    .field input[type=text],
+    .field input[type=number],
+    .field input[type=email],
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid #e5e0d8;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #fff;
+      min-height: 42px;
+    }
+    .field textarea { min-height: 100px; resize: vertical; }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: 2px solid var(--color-accent);
+      outline-offset: 1px;
+    }
+    .field .hint { font-size: 0.78rem; color: var(--color-muted); margin-top: 0.3rem; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Checkbox */
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.7rem 0;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+    .checkbox input { width: 18px; height: 18px; accent-color: var(--color-accent); }
+
+    /* Preview */
+    .preview {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .preview h2 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      margin: 0 0 1rem;
+    }
+    .preview img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      object-fit: cover;
+      border-radius: 8px;
+      background: #f0e6dc;
+    }
+    .preview .empty-img {
+      width: 100%;
+      aspect-ratio: 4/5;
+      background: #f0e6dc;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--color-muted);
+      font-size: 0.85rem;
+    }
+
+    /* Acciones */
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #efece5;
+    }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid #e5e0d8;
+      color: var(--color-ink);
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-secondary:hover { background: #f5f3ef; }
+    .btn-primary {
+      background: #c2410c;
+      color: #fff;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary:hover { background: #9a330a; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-side">
+      <div class="admin-side__brand">AbstractFluidArt</div>
+      <div class="admin-side__sub">Admin</div>
+      <nav class="admin-side__nav">
+        <a href="/admin/dashboard.html">🏠 Dashboard</a>
+        <a href="/admin/obras.html" class="active">🖼️ Obras</a>
+        <a href="/admin/categorias.html">📂 Categorías</a>
+        <a href="/admin/pedidos.html">📦 Pedidos</a>
+        <a href="/admin/mensajes.html">💬 Mensajes</a>
+        <a href="/admin/artista.html">👩‍🎨 Sobre Cristina</a>
+        <a href="/" target="_blank">🌐 Ver web pública ↗</a>
+      </nav>
+      <button class="admin-side__logout" id="logout">Cerrar sesión</button>
+    </aside>
+
+    <main class="admin-main">
+      <div class="breadcrumb">
+        <a href="/admin/obras.html">← Obras</a>
+      </div>
+      <h1 class="admin-title" id="page-title">Cargando…</h1>
+
+      <form id="obra-form">
+        <div class="form-grid">
+
+          <!-- COLUMNA IZQUIERDA: campos principales -->
+          <div>
+            <div class="form-card">
+              <h2>Información principal</h2>
+
+              <div class="field">
+                <label for="title">Título <span class="req">*</span></label>
+                <input type="text" id="title" name="title" required>
+              </div>
+
+              <div class="field">
+                <label for="subtitle">Subtítulo</label>
+                <input type="text" id="subtitle" name="subtitle">
+              </div>
+
+              <div class="field">
+                <label for="category_id">Categoría</label>
+                <select id="category_id" name="category_id">
+                  <option value="">— Sin categoría —</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="technique">Técnica <span class="req">*</span></label>
+                <input type="text" id="technique" name="technique" required
+                       placeholder="Acuarela sobre papel algodón">
+              </div>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="dimensions">Dimensiones <span class="req">*</span></label>
+                  <input type="text" id="dimensions" name="dimensions" required
+                         placeholder="42 x 30 cm">
+                </div>
+                <div class="field">
+                  <label for="year_month">Fecha</label>
+                  <input type="text" id="year_month" name="year_month"
+                         placeholder="2026-09">
+                  <div class="hint">Formato: AAAA-MM</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h2>Precio y stock</h2>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="price">Precio (€) <span class="req">*</span></label>
+                  <input type="number" id="price" name="price" step="0.01" min="0" required
+                         placeholder="180.00">
+                </div>
+                <div class="field">
+                  <label for="stock">Stock</label>
+                  <input type="number" id="stock" name="stock" step="1" min="0" value="1">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h2>Imagen</h2>
+              <div class="field">
+                <label for="image_file">Nombre del archivo <span class="req">*</span></label>
+                <input type="text" id="image_file" name="image_file" required
+                       placeholder="agua.jpg">
+                <div class="hint">
+                  Escribe solo el nombre del archivo. Debe estar en <code>assets/img/</code>.
+                  (En el sub-paso 2.10 podrás subir imágenes directamente.)
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h2>Contenido editorial</h2>
+
+              <div class="field">
+                <label for="description">Descripción</label>
+                <textarea id="description" name="description" rows="4"
+                          placeholder="Texto descriptivo de la obra..."></textarea>
+              </div>
+
+              <div class="field">
+                <label for="poetic_phrase">Frase poética</label>
+                <textarea id="poetic_phrase" name="poetic_phrase" rows="2"
+                          placeholder="Una frase breve que acompañe la obra..."></textarea>
+              </div>
+
+              <div class="field">
+                <label for="story">Historia / Contexto</label>
+                <textarea id="story" name="story" rows="3"
+                          placeholder="Historia, anécdota o contexto de creación..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- COLUMNA DERECHA: preview + visibilidad -->
+          <div>
+            <div class="preview">
+              <h2>Vista previa</h2>
+              <div id="preview-container">
+                <div class="empty-img">Sin imagen</div>
+              </div>
+            </div>
+
+            <div class="form-card" style="margin-top: 1.5rem;">
+              <h2>Visibilidad</h2>
+
+              <label class="checkbox">
+                <input type="checkbox" id="is_featured" name="is_featured">
+                <span>Destacada en la home</span>
+              </label>
+
+              <label class="checkbox">
+                <input type="checkbox" id="is_published" name="is_published" checked>
+                <span>Publicada en la galería</span>
+              </label>
+
+              <label class="checkbox">
+                <input type="checkbox" id="is_available" name="is_available" checked>
+                <span>Disponible para venta</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <a href="/admin/obras.html" class="btn-secondary">Cancelar</a>
+          <button type="submit" class="btn-primary" id="save-btn">Guardar</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script type="module" src="/admin/js/obras-editar.js"></script>
+</body>
+</html>
