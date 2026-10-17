@@ -414,7 +414,10 @@ app.get('/api/admin/orders', requireAdmin, (_req, res) => {
     JOIN customers c ON c.id = o.customer_id
     ORDER BY o.created_at DESC
   `).all();
-  res.json(rows);
+
+  // Añadimos los items de cada pedido
+  const stmt = db.prepare('SELECT * FROM order_items WHERE order_id = ?');
+  res.json(rows.map(o => ({ ...o, items: stmt.all(o.id) })));
 });
 
 app.put('/api/admin/orders/:id', requireAdmin, (req, res) => {
@@ -433,6 +436,39 @@ app.get('/api/admin/messages', requireAdmin, (_req, res) => {
 app.put('/api/admin/messages/:id', requireAdmin, (req, res) => {
   db.prepare('UPDATE messages SET is_read = 1 WHERE id = ?').run(req.params.id);
   res.json({ ok: true });
+});
+
+// ---------- Artist (admin) ----------
+
+app.put('/api/admin/artist', requireAdmin, (req, res) => {
+  const {
+    name, bio, statement, photo_url, instagram, whatsapp, email,
+  } = req.body;
+
+  if (!name || !name.trim()) {
+    return res.status(400).json({ error: 'El nombre es obligatorio' });
+  }
+
+  try {
+    const existing = db.prepare('SELECT id FROM artists LIMIT 1').get();
+
+    if (existing) {
+      db.prepare(`
+        UPDATE artists
+        SET name = ?, bio = ?, statement = ?, photo_url = ?, instagram = ?, whatsapp = ?, email = ?
+        WHERE id = ?
+      `).run(name, bio ?? null, statement ?? null, photo_url ?? null, instagram ?? null, whatsapp ?? null, email ?? null, existing.id);
+    } else {
+      db.prepare(`
+        INSERT INTO artists (name, bio, statement, photo_url, instagram, whatsapp, email)
+        VALUES (?,?,?,?,?,?,?)
+      `).run(name, bio ?? null, statement ?? null, photo_url ?? null, instagram ?? null, whatsapp ?? null, email ?? null);
+    }
+
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(400).json({ error: e.message });
+  }
 });
 
 // ============================================================
