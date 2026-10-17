@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Obras · Admin · AbstractFluidArt</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    body { background: #f5f3ef; }
+    .admin-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .admin-side { background: #1a1a1a; color: #e5e0d8; padding: 2rem 1.2rem; }
+    .admin-side__brand { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #faf7f2; margin-bottom: 0.2rem; }
+    .admin-side__sub { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #c2410c; margin-bottom: 2rem; }
+    .admin-side__nav { display: grid; gap: 0.3rem; }
+    .admin-side__nav a { display: block; padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.9rem; color: #d4cec4; transition: background 0.15s; }
+    .admin-side__nav a:hover { background: #2a2a2a; color: #fff; }
+    .admin-side__nav a.active { background: #c2410c; color: #fff; font-weight: 600; }
+    .admin-side__logout { margin-top: 2rem; font-size: 0.85rem; color: #9b9489; cursor: pointer; background: none; border: none; padding: 0; }
+    .admin-side__logout:hover { color: #c2410c; }
+    .admin-main { padding: 2.5rem; max-width: 1400px; }
+    .admin-title { font-family: var(--font-display); font-size: 2rem; margin: 0 0 0.3rem; }
+    .admin-sub { color: var(--color-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+    .toolbar {
+      display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    .toolbar__search {
+      flex: 1; min-width: 240px;
+      padding: 0.7rem 1rem; border: 1px solid #e5e0d8;
+      border-radius: 8px; background: #fff; font-size: 0.95rem;
+    }
+    .toolbar select {
+      padding: 0.7rem 1rem; border: 1px solid #e5e0d8;
+      border-radius: 8px; background: #fff; font-size: 0.95rem;
+    }
+    .toolbar__btn {
+      padding: 0.7rem 1.2rem; background: #c2410c; color: #fff;
+      border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+      text-decoration: none; display: inline-block;
+    }
+    .toolbar__btn:hover { background: #9a330a; }
+
+    .artwork-table {
+      width: 100%; background: #fff; border-radius: 12px; overflow: hidden;
+      border-collapse: collapse; box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .artwork-table th, .artwork-table td {
+      text-align: left; padding: 0.85rem 1rem;
+      border-bottom: 1px solid #efece5; font-size: 0.9rem; vertical-align: middle;
+    }
+    .artwork-table th {
+      background: #f9f7f3; font-size: 0.75rem; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--color-muted); font-weight: 600;
+    }
+    .artwork-table tr:last-child td { border-bottom: none; }
+    .artwork-table tr:hover td { background: #fcfbf8; }
+    .artwork-table img {
+      width: 60px; height: 75px; object-fit: cover; border-radius: 6px;
+      display: block;
+    }
+    .artwork-title { font-weight: 600; color: var(--color-ink); }
+    .artwork-meta { font-size: 0.78rem; color: var(--color-muted); margin-top: 0.1rem; }
+    .artwork-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .icon-btn {
+      width: 34px; height: 34px; display: inline-flex; align-items: center;
+      justify-content: center; border-radius: 8px; border: 1px solid #e5e0d8;
+      background: #fff; cursor: pointer; font-size: 1rem;
+      transition: all 0.15s;
+    }
+    .icon-btn:hover { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .icon-btn.is-active { background: #fef3c7; border-color: #f59e0b; }
+    .badge { font-size: 0.7rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; display: inline-block; margin-right: 0.3rem; }
+    .badge--featured { background: #fef3c7; color: #92400e; }
+    .badge--draft    { background: #f3f4f6; color: #6b7280; }
+    .badge--unavailable { background: #fee2e2; color: #991b1b; }
+
+    .empty {
+      background: #fff; border-radius: 12px; padding: 3rem;
+      text-align: center; color: var(--color-muted);
+    }
+
+    @media (max-width: 900px) {
+      .admin-shell { grid-template-columns: 1fr; }
+      .admin-side { padding: 1.2rem; }
+      .admin-main { padding: 1.5rem; }
+      .artwork-table th:nth-child(3),
+      .artwork-table td:nth-child(3) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <!-- Sidebar -->
+    <aside class="admin-side">
+      <div class="admin-side__brand">AbstractFluidArt</div>
+      <div class="admin-side__sub">Admin</div>
+      <nav class="admin-side__nav">
+        <a href="/admin/dashboard.html">🏠 Dashboard</a>
+        <a href="/admin/obras.html" class="active">🖼️ Obras</a>
+        <a href="/admin/categorias.html">📂 Categorías</a>
+        <a href="/admin/pedidos.html">📦 Pedidos</a>
+        <a href="/admin/mensajes.html">💬 Mensajes</a>
+        <a href="/admin/artista.html">👩‍🎨 Sobre Cristina</a>
+        <a href="/" target="_blank">🌐 Ver web pública ↗</a>
+      </nav>
+      <button class="admin-side__logout" id="logout">Cerrar sesión</button>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+      <h1 class="admin-title">Obras</h1>
+      <p class="admin-sub">Gestiona todas las piezas de la galería.</p>
+
+      <!-- Barra de herramientas -->
+      <div class="toolbar">
+        <input type="text" class="toolbar__search" id="search" placeholder="Buscar por título, técnica…">
+        <select id="filter-category">
+          <option value="">Todas las categorías</option>
+        </select>
+        <select id="filter-status">
+          <option value="">Todos los estados</option>
+          <option value="published">Publicadas</option>
+          <option value="draft">No publicadas</option>
+          <option value="featured">Destacadas</option>
+        </select>
+        <a href="/admin/obras-editar.html" class="toolbar__btn">+ Nueva obra</a>
+      </div>
+
+      <!-- Tabla -->
+      <div id="tabla-container">
+        <div class="empty">Cargando obras…</div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="/admin/js/obras-admin.js"></script>
+</body>
+</html>
