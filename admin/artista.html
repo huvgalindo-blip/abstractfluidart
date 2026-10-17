@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sobre Cristina · Admin · AbstractFluidArt</title>
+  <meta name="robots" content="noindex, nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/base.css" />
+  <link rel="stylesheet" href="/css/layout.css" />
+  <link rel="stylesheet" href="/css/components.css" />
+
+  <style>
+    body { background: #f5f3ef; }
+    .admin-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+    .admin-side { background: #1a1a1a; color: #e5e0d8; padding: 2rem 1.2rem; }
+    .admin-side__brand { font-family: var(--font-display); font-size: 1.4rem; font-weight: 600; color: #faf7f2; margin-bottom: 0.2rem; }
+    .admin-side__sub { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: #c2410c; margin-bottom: 2rem; }
+    .admin-side__nav { display: grid; gap: 0.3rem; }
+    .admin-side__nav a { display: block; padding: 0.65rem 0.9rem; border-radius: 8px; font-size: 0.9rem; color: #d4cec4; }
+    .admin-side__nav a:hover { background: #2a2a2a; color: #fff; }
+    .admin-side__nav a.active { background: #c2410c; color: #fff; font-weight: 600; }
+    .admin-side__logout { margin-top: 2rem; font-size: 0.85rem; color: #9b9489; cursor: pointer; background: none; border: none; padding: 0; }
+
+    .admin-main { padding: 2.5rem; max-width: 1100px; }
+    .admin-title { font-family: var(--font-display); font-size: 2rem; margin: 0 0 0.3rem; }
+    .admin-sub { color: var(--color-muted); margin-bottom: 2rem; font-size: 0.95rem; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 2rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .admin-shell { grid-template-columns: 1fr; }
+      .admin-side { padding: 1.2rem; }
+      .admin-main { padding: 1.5rem; }
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .form-card {
+      background: #fff; border-radius: 12px; padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .form-card + .form-card { margin-top: 1.5rem; }
+    .form-card h2 {
+      font-family: var(--font-display); font-size: 1.2rem;
+      margin: 0 0 1.2rem; padding-bottom: 0.6rem;
+      border-bottom: 1px solid #efece5;
+    }
+
+    .field { margin-bottom: 1.2rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      display: block; font-size: 0.8rem; font-weight: 600;
+      color: var(--color-ink); margin-bottom: 0.35rem;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .field label .req { color: #c2410c; }
+    .field input[type=text],
+    .field input[type=email],
+    .field input[type=url],
+    .field input[type=tel],
+    .field textarea {
+      width: 100%; padding: 0.7rem 0.9rem;
+      border: 1px solid #e5e0d8; border-radius: 8px;
+      font-size: 0.95rem; font-family: inherit; background: #fff;
+      min-height: 42px;
+    }
+    .field textarea { min-height: 130px; resize: vertical; line-height: 1.6; }
+    .field input:focus,
+    .field textarea:focus { outline: 2px solid var(--color-accent); outline-offset: 1px; }
+    .field .hint { font-size: 0.78rem; color: var(--color-muted); margin-top: 0.3rem; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    /* Preview */
+    .preview {
+      background: #fff; border-radius: 12px; padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+    .preview h2 {
+      font-family: var(--font-display); font-size: 1.2rem;
+      margin: 0 0 1rem;
+    }
+    .preview img {
+      width: 100%; aspect-ratio: 1; object-fit: cover;
+      border-radius: 50%; margin-bottom: 1rem;
+      background: #f0e6dc;
+    }
+    .preview .empty-img {
+      width: 100%; aspect-ratio: 1; background: #f0e6dc;
+      border-radius: 50%; display: grid; place-items: center;
+      color: var(--color-muted); font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .preview .statement-preview {
+      font-family: var(--font-display); font-style: italic;
+      font-size: 1rem; border-left: 3px solid #c2410c;
+      padding-left: 1rem; color: var(--color-ink);
+      white-space: pre-wrap; line-height: 1.6;
+    }
+
+    /* Acciones */
+    .form-actions {
+      display: flex; gap: 1rem; justify-content: flex-end;
+      margin-top: 2rem; padding-top: 1.5rem;
+      border-top: 1px solid #efece5;
+    }
+    .btn-primary {
+      background: #c2410c; color: #fff; border: none;
+      padding: 0.8rem 1.6rem; border-radius: 8px;
+      font-weight: 600; cursor: pointer; font-size: 0.95rem;
+    }
+    .btn-primary:hover { background: #9a330a; }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="admin-shell">
+    <aside class="admin-side">
+      <div class="admin-side__brand">AbstractFluidArt</div>
+      <div class="admin-side__sub">Admin</div>
+      <nav class="admin-side__nav">
+        <a href="/admin/dashboard.html">🏠 Dashboard</a>
+        <a href="/admin/obras.html">🖼️ Obras</a>
+        <a href="/admin/categorias.html">📂 Categorías</a>
+        <a href="/admin/pedidos.html">📦 Pedidos</a>
+        <a href="/admin/mensajes.html">💬 Mensajes</a>
+        <a href="/admin/artista.html" class="active">👩‍🎨 Sobre Cristina</a>
+        <a href="/" target="_blank">🌐 Ver web pública ↗</a>
+      </nav>
+      <button class="admin-side__logout" id="logout">Cerrar sesión</button>
+    </aside>
+
+    <main class="admin-main">
+      <h1 class="admin-title">Sobre Cristina</h1>
+      <p class="admin-sub">Edita la biografía y el statement que aparecen en la web.</p>
+
+      <form id="artista-form">
+        <div class="form-grid">
+          <!-- Columna izquierda: formulario -->
+          <div>
+            <div class="form-card">
+              <h2>Información básica</h2>
+
+              <div class="field">
+                <label for="name">Nombre <span class="req">*</span></label>
+                <input type="text" id="name" name="name" required>
+              </div>
+
+              <div class="field">
+                <label for="photo_url">Foto de perfil</label>
+                <input type="text" id="photo_url" name="photo_url"
+                       placeholder="/assets/img/placeholder.svg">
+                <div class="hint">
+                  Ruta o URL de la imagen. Puede ser un archivo de <code>assets/img/</code>
+                  o una URL externa.
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h2>Biografía</h2>
+              <div class="field">
+                <label for="bio">Texto biográfico</label>
+                <textarea id="bio" name="bio" rows="8"
+                          placeholder="Nace en Alicante en 1977..."></textarea>
+                <div class="hint">Este texto aparece en la página "Sobre Cristina".</div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h2>Statement</h2>
+              <div class="field">
+                <label for="statement">Texto del statement artístico</label>
+                <textarea id="statement" name="statement" rows="10"
+                          placeholder="Me sitúo en la pintura desde la intuición..."></textarea>
+                <div class="hint">Este texto se muestra destacado en la home y en la página "Sobre Cristina".</div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h2>Contacto</h2>
+
+              <div class="field-row">
+                <div class="field">
+                  <label for="instagram">Instagram (URL completa)</label>
+                  <input type="url" id="instagram" name="instagram"
+                         placeholder="https://www.instagram.com/xtinpache">
+                </div>
+
+                <div class="field">
+                  <label for="whatsapp">WhatsApp (con prefijo)</label>
+                  <input type="tel" id="whatsapp" name="whatsapp"
+                         placeholder="+34627365261">
+                </div>
+              </div>
+
+              <div class="field">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email"
+                       placeholder="xtinpacheco@gmail.com">
+              </div>
+            </div>
+          </div>
+
+          <!-- Columna derecha: preview -->
+          <div>
+            <div class="preview">
+              <h2>Vista previa</h2>
+              <div id="photo-preview">
+                <div class="empty-img">Sin foto</div>
+              </div>
+              <p style="margin:0 0 .5rem;font-family:var(--font-display);font-size:1.3rem;font-weight:600"
+                 id="name-preview">—</p>
+              <div class="statement-preview" id="statement-preview">
+                El statement aparecerá aquí.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="save-btn">Guardar cambios</button>
+        </div>
+      </form>
+    </main>
+  </div>
+
+  <script type="module" src="/admin/js/artista-admin.js"></script>
+</body>
+</html>
